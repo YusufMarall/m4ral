@@ -9,6 +9,40 @@ Bu depo, yetkili güvenlik testleri ve tehdit istihbaratı için geliştirilmiş
 
 ---
 
+## Kullanılan Teknolojiler
+
+### auth_pentest_tool
+
+| Katman | Teknoloji |
+| --- | --- |
+| Dil | Python 3 |
+| Çalışma ortamı | Kali Linux Rolling (Docker) veya yerel Python 3 |
+| HTTP istemci | `requests`, `cloudscraper`, `requests-toolbelt` |
+| HTML ayrıştırma | `beautifulsoup4` (bs4), `lxml` |
+| Terminal çıktısı | `colorama` |
+| Gömülü araçlar (Docker imajı) | `nmap`, `whois`, `dig`/`dnsutils`, `netcat`, `curl`/`wget`, `subfinder`, `amass`, `theHarvester`, `CeWL`, `gobuster`, `ffuf`, `nikto`, `testssl.sh` |
+| Wordlist | SecLists + `wordlists` (rockyou.txt) |
+| Servis denetim araçları | `ssh-audit`, `smbclient`, `nfs-common` (showmount) |
+| Konteyner | Docker — `kalilinux/kali-rolling` tabanlı, `ENTRYPOINT` ile CLI |
+| Raporlama | HTML / TXT / JSON (saf Python, harici motor yok) |
+
+### opentip
+
+| Katman | Teknoloji |
+| --- | --- |
+| Dil | Python 3.13 |
+| Web arayüz | Streamlit 1.39 |
+| Ayarlar / veri doğrulama | Pydantic 2 + pydantic-settings |
+| HTTP istemci | `requests` |
+| Zamanlayıcı (periyodik kontrol) | APScheduler |
+| Rapor şablonları | Jinja2 |
+| Ortam değişkenleri | python-dotenv (`.env`) |
+| Veritabanı | SQLite |
+| Test | pytest |
+| Konteyner | Docker · Docker Compose (`python:3.13-slim`, non-root kullanıcı, healthcheck) |
+
+---
+
 ## 1. auth_pentest_tool — Otonom Auth Pentest Aracı
 
 TSE A sınıfı sızma testi akışına uygun, aşamalı (önce pasif, sonra onaylı aktif) çalışan tek dosyalık (standalone) bir CLI aracıdır. Kali Linux tabanlı bir Docker imajı ile tüm bağımlılıklarıyla birlikte gelir.
@@ -79,6 +113,48 @@ streamlit run app.py
 ```
 
 Arayüz: <http://localhost:8501> · Docker: `docker compose up -d --build`
+
+---
+
+## API Anahtarları ve Ortam Değişkenleri
+
+### auth_pentest_tool
+
+Araç **hiçbir API anahtarı veya `.env` dosyası gerektirmez**. Yalnızca hedefe doğrudan HTTP istekleri ve herkese açık / anahtarsız servisleri (dns.google, crt.sh, RDAP, Wayback Machine vb.) kullanır.
+
+### opentip
+
+`.env.example` dosyasını `.env` olarak kopyalayıp doldurun. **`.env` asla sürüm kontrolüne eklenmez** (bkz. `.gitignore`). Kaynaklar varsayılan olarak kapalıdır; yalnızca etkinleştirdiğiniz kaynakların anahtarları gerekir.
+
+#### Veri kaynağı anahtarları
+
+| Değişken(ler) | Kaynak | Zorunluluk | Nereden alınır |
+| --- | --- | --- | --- |
+| `OTX_API_KEY` | AlienVault OTX | Opsiyonel (anahtarsız da kısıtlı çalışır) | https://otx.alienvault.com |
+| `THREATFOX_API_KEY` | abuse.ch ThreatFox | `THREATFOX_ENABLED=true` ise gerekli | https://threatfox.abuse.ch/api/ |
+| `MISP_URL`, `MISP_API_KEY` | MISP örneği | Yalnızca yetkili erişim | Kendi MISP kurulumunuz |
+| `XPOSEDORNOT_API_KEY` | XposedOrNot | Public sorgu anahtarsız; doğrulanmış domain izleme için gerekli | https://xposedornot.com |
+| `BREACH_FEED_URL`, `BREACH_FEED_API_KEY` | İzinli breach feed | Sağlayıcı sözleşmesi | Tedarikçi (yapılandırılmış JSON akışı) |
+| `DARKWEB_SOURCE_URL`, `DARKWEB_SOURCE_API_KEY` | İzinli dark web kaynağı | Sağlayıcı sözleşmesi | Tedarikçi |
+| `DEEPDARKCTI_BASE_URL` | deepdarkCTI (GitHub) | **Anahtar gerekmez** | https://github.com/fastfire/deepdarkCTI |
+
+#### Genel yapılandırma
+
+| Değişken | Varsayılan | Açıklama |
+| --- | --- | --- |
+| `APP_NAME` | `OpenTIP` | Uygulama adı |
+| `ENVIRONMENT` | `development` | Çalışma ortamı |
+| `LOG_LEVEL` | `INFO` | Log seviyesi |
+| `DATABASE_PATH` | `./data/opentip.db` | SQLite veritabanı yolu |
+| `REPORT_OUTPUT_DIR` | `./reports_output` | Rapor çıktı klasörü |
+| `HTTP_TIMEOUT` | `15` | Tüm adaptörler için HTTP zaman aşımı (sn) |
+| `HTTP_MAX_RETRIES` | `3` | HTTP yeniden deneme sayısı |
+| `HTTP_BACKOFF_SECONDS` | `1.5` | Denemeler arası bekleme (sn) |
+| `REQUESTS_PER_MINUTE` | `30` | Dakikalık istek hız limiti |
+| `SCHEDULER_ENABLED` | `false` | Periyodik kontrol (MVP'de kapalı) |
+| `DEFAULT_CHECK_INTERVAL_MINUTES` | `60` | Kontrol aralığı (dk) |
+
+> Tüm anahtarlar yalnızca `.env` üzerinden okunur ve **imaja gömülmez** (`docker-compose.yml` `env_file` kullanır). Repoda hiçbir gerçek anahtar bulunmaz; yalnızca boş değerli `.env.example` yer alır.
 
 ---
 
