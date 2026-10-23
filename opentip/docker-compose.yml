@@ -1,0 +1,26 @@
+# OpenTIP — Docker Compose
+# Kullanım:
+#   cp .env.example .env   (ve gerekli değerleri girin)
+#   docker compose up -d --build
+#   docker compose exec opentip python -m pytest
+services:
+  opentip:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    image: opentip:latest
+    container_name: opentip
+    # API anahtarları ve yapılandırma .env dosyasından okunur; imaja gömülmez.
+    env_file:
+      - path: .env
+        required: false
+    environment:
+      # Konteyner içi kalıcı yollar (volume ile host'a bağlanır).
+      DATABASE_PATH: /app/data/opentip.db
+      REPORT_OUTPUT_DIR: /app/reports_output
+    ports:
+      - "8501:8501"
+    volumes:
+      - ./data:/app/data
+      - ./reports_output:/app/reports_output
+    restart: unless-stopped

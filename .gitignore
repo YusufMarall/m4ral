@@ -1,0 +1,44 @@
+# --- Gizli bilgiler / ortam ---
+.env
+.env.*
+*.env
+!.env.example
+
+# --- Sertifika / anahtar dosyaları ---
+*.pem
+*.key
+*.crt
+*.p12
+*.pfx
+secrets.toml
+
+# --- Tarama çıktıları / veri / raporlar ---
+results/
+data/
+reports_output/
+*.db
+*.sqlite3
+*.db-wal
+*.db-shm
+*.log
+
+# --- Python ---
+__pycache__/
+*.py[cod]
+*.egg-info/
+.venv/
+venv/
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+.coverage
+htmlcov/
+
+# --- Editör / işletim sistemi ---
+.vscode/
+.idea/
+.DS_Store
+Thumbs.db
+*.bak
+*.orig
+*.rej

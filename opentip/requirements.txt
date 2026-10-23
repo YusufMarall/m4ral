@@ -1,0 +1,12 @@
+# OpenTIP - Open Threat Intelligence Platform
+# Runtime
+streamlit==1.39.0
+requests==2.32.3
+pydantic==2.9.2
+pydantic-settings==2.5.2
+APScheduler==3.10.4
+Jinja2==3.1.4
+python-dotenv==1.0.1
+
+# Test
+pytest==8.3.3

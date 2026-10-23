@@ -1,0 +1,194 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+<meta charset="utf-8" />
+<title>{{ title }}</title>
+<style>
+  :root { color-scheme: light; }
+  * { box-sizing: border-box; }
+  body {
+    font-family: -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+    margin: 0; padding: 32px; background: #f5f6f8; color: #1c2024; font-size: 14px;
+  }
+  h1 { font-size: 22px; margin: 0 0 4px; }
+  h2 { font-size: 17px; margin: 32px 0 12px; padding-bottom: 6px; border-bottom: 2px solid #e3e6ea; }
+  h3 { font-size: 14px; margin: 20px 0 8px; }
+  .meta { color: #5c6672; font-size: 12px; margin-bottom: 24px; }
+  .card { background: #fff; border: 1px solid #e3e6ea; border-radius: 8px; padding: 20px; margin-bottom: 20px; }
+  table { width: 100%; border-collapse: collapse; font-size: 13px; }
+  th, td { text-align: left; padding: 8px 10px; border-bottom: 1px solid #eceff2; vertical-align: top; }
+  th { background: #fafbfc; font-weight: 600; color: #3a4553; white-space: nowrap; }
+  tr:last-child td { border-bottom: none; }
+  code { background: #f2f4f6; padding: 1px 5px; border-radius: 4px; font-size: 12px; }
+  .badge { display: inline-block; padding: 2px 8px; border-radius: 10px; font-size: 11px; font-weight: 600; white-space: nowrap; }
+  .risk-critical { background: #fde8e8; color: #9b1c1c; }
+  .risk-high { background: #fef0e6; color: #92400e; }
+  .risk-medium { background: #fef9e7; color: #854d0e; }
+  .risk-low { background: #eaf7ee; color: #166534; }
+  .risk-unassessed, .status-unknown { background: #eef1f4; color: #4b5563; }
+  .st-new { background: #e8f0fe; color: #1d4ed8; }
+  .st-under_review { background: #fff7e6; color: #92400e; }
+  .st-unverified_claim { background: #fdf2f8; color: #9d174d; }
+  .st-corroborated { background: #ecfdf5; color: #065f46; }
+  .st-confirmed { background: #e6f4ea; color: #14532d; }
+  .st-false_positive { background: #f3f4f6; color: #4b5563; }
+  .st-closed { background: #eceff2; color: #374151; }
+  .src-ok { color: #166534; font-weight: 600; }
+  .src-error { color: #9b1c1c; font-weight: 600; }
+  ul.reasons { margin: 6px 0 0; padding-left: 18px; color: #4b5563; }
+  ul.reasons li { margin-bottom: 2px; }
+  .notice { background: #fffbea; border: 1px solid #fde68a; border-radius: 8px; padding: 12px 16px; margin-bottom: 20px; color: #713f12; }
+  .stats { display: flex; gap: 24px; flex-wrap: wrap; }
+  .stat { min-width: 120px; }
+  .stat .value { font-size: 22px; font-weight: 700; }
+  .stat .label { color: #5c6672; font-size: 12px; }
+  footer { margin-top: 32px; color: #7a8592; font-size: 11px; line-height: 1.6; }
+</style>
+</head>
+<body>
+
+<h1>{{ title }}</h1>
+<div class="meta">
+  OpenTIP raporu &middot; oluşturulma: {{ generated_at }} &middot; kapsam: yapılandırılmış ve izinli kaynaklar
+</div>
+
+{% if notice %}
+<div class="notice">{{ notice }}</div>
+{% endif %}
+
+{% if stats %}
+<div class="card">
+  <h2 style="margin-top:0">Özet</h2>
+  <div class="stats">
+    {% for key, value in stats.items() %}
+    <div class="stat">
+      <div class="value">{{ value }}</div>
+      <div class="label">{{ key }}</div>
+    </div>
+    {% endfor %}
+  </div>
+</div>
+{% endif %}
+
+{% if analysis %}
+<div class="card">
+  <h2 style="margin-top:0">IOC Analizi</h2>
+  <p>
+    <strong>Gösterge:</strong> <code>{{ analysis.value }}</code>
+    &middot; <strong>Tür:</strong> {{ analysis.ioc_type }}
+    &middot; <strong>Risk:</strong>
+    <span class="badge risk-{{ analysis.risk_level }}">{{ analysis.risk_level }}</span>
+    {% if analysis.risk_score is not none %}&middot; <strong>Puan:</strong> {{ analysis.risk_score }}/100{% endif %}
+  </p>
+
+  <h3>Kaynak durumları</h3>
+  <table>
+    <thead>
+      <tr><th>Kaynak</th><th>Durum</th><th>Kayıt</th><th>Hata</th><th>Süre (ms)</th></tr>
+    </thead>
+    <tbody>
+      {% for source in analysis.sources %}
+      <tr>
+        <td>{{ source.source_name }}</td>
+        <td class="{{ 'src-error' if source.error else 'src-ok' }}">{{ source.status }}</td>
+        <td>{{ source.record_count }}</td>
+        <td>{{ source.error or '-' }}</td>
+        <td>{{ source.duration_ms if source.duration_ms is not none else '-' }}</td>
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+
+  {% if analysis.record_count %}
+  <h3>Tekilleştirilmiş kayıtlar ({{ analysis.record_count }})</h3>
+  <table>
+    <thead>
+      <tr><th>Gösterge</th><th>Tür</th><th>Risk</th><th>Etiketler</th><th>Son görülme</th><th>Kaynaklar</th></tr>
+    </thead>
+    <tbody>
+      {% for record in analysis.records %}
+      <tr>
+        <td><code>{{ record.value }}</code></td>
+        <td>{{ record.ioc_type }}</td>
+        <td><span class="badge risk-{{ record.risk_level }}">{{ record.risk_level }}</span></td>
+        <td>{{ record.tags | join(', ') if record.tags else '-' }}</td>
+        <td>{{ record.last_seen }}</td>
+        <td>{{ record.sources | join(', ') if record.sources else '-' }}</td>
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+  {% else %}
+  <p>Tekilleştirme sonrası kayıt bulunamadı.</p>
+  {% endif %}
+
+  {% if analysis.risk_reasons %}
+  <h3>Risk gerekçeleri</h3>
+  <ul class="reasons">
+    {% for reason in analysis.risk_reasons %}<li>{{ reason }}</li>{% endfor %}
+  </ul>
+  {% endif %}
+
+  {% if analysis.notes %}
+  <h3>Notlar</h3>
+  <ul class="reasons">
+    {% for note in analysis.notes %}<li>{{ note }}</li>{% endfor %}
+  </ul>
+  {% endif %}
+</div>
+{% endif %}
+
+{% if findings %}
+<div class="card">
+  <h2 style="margin-top:0">Bulgular ({{ findings | length }})</h2>
+  <table>
+    <thead>
+      <tr>
+        <th>ID</th><th>Tür</th><th>Hedef</th><th>Kaynak</th><th>Referans</th>
+        <th>Risk</th><th>Doğrulama</th><th>İlk görülme</th><th>Son kontrol</th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for finding in findings %}
+      <tr>
+        <td><code>{{ finding.finding_id }}</code></td>
+        <td>{{ finding.finding_type }}</td>
+        <td>{{ finding.target or '-' }}</td>
+        <td>{{ finding.source_name }}</td>
+        <td>
+          {% if finding.source_reference %}
+          <code>{{ finding.source_reference }}</code>
+          {% else %}-{% endif %}
+        </td>
+        <td><span class="badge risk-{{ finding.risk_level }}">{{ finding.risk_level }}</span></td>
+        <td><span class="badge st-{{ finding.verification_status }}">{{ finding.verification_status }}</span></td>
+        <td>{{ finding.first_seen }}</td>
+        <td>{{ finding.last_checked }}</td>
+      </tr>
+      <tr>
+        <td colspan="9" style="background:#fcfcfd">
+          <strong>Kanıt özeti:</strong> {{ finding.evidence_summary or 'yok' }}
+          {% if finding.risk_reasons %}
+          <ul class="reasons">
+            {% for reason in finding.risk_reasons[:5] %}<li>{{ reason }}</li>{% endfor %}
+          </ul>
+          {% endif %}
+        </td>
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+</div>
+{% elif not analysis %}
+<div class="card"><p>Raporlanacak bulgu bulunamadı.</p></div>
+{% endif %}
+
+<footer>
+  Bu rapor OpenTIP tarafından otomatik üretilmiştir. İçerik; yapılandırılmış ve erişim izni
+  bulunan kaynaklardan alınan kayıtlara dayanır. Doğrulanmamış iddialar ihlal olarak
+  sunulmaz; her bulgunun doğrulama durumu ve kaynak referansı ayrıca belirtilir.
+  Rapor içeriğinde API anahtarı veya gizli yapılandırma bilgisi bulunmaz.
+</footer>
+
+</body>
+</html>

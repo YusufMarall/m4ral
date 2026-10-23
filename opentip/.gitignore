@@ -1,0 +1,48 @@
+# --- Ortam ve gizli bilgiler ---
+# Gerçek API anahtarları/URL'ler yalnızca .env içinde tutulur ve ASLA commit edilmez.
+.env
+.env.*
+*.env
+!.env.example
+
+# Sertifika / anahtar dosyaları
+*.pem
+*.key
+*.crt
+*.p12
+*.pfx
+secrets.toml
+.streamlit/secrets.toml
+
+# Müşteri verisi ve yerel durum
+data/
+*.db
+*.sqlite3
+*.db-wal
+*.db-shm
+
+# Üretilen raporlar ve kayıtlar
+reports_output/
+results/
+*.log
+
+# Python
+__pycache__/
+*.py[cod]
+*.egg-info/
+.venv/
+venv/
+.pytest_cache/
+.coverage
+htmlcov/
+.mypy_cache/
+.ruff_cache/
+
+# Editör / işletim sistemi / yedekler
+.vscode/
+.idea/
+.DS_Store
+Thumbs.db
+*.bak
+*.orig
+*.rej
