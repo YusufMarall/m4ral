@@ -1,4 +1,4 @@
-# m4ral — Güvenlik Araçları Koleksiyonu
+
 
 Bu depo, yetkili güvenlik testleri ve tehdit istihbaratı için geliştirilmiş iki bağımsız projeyi barındırır:
 
@@ -137,7 +137,7 @@ Araç **hiçbir API anahtarı veya `.env` dosyası gerektirmez**. Yalnızca hede
 | `BREACH_FEED_URL`, `BREACH_FEED_API_KEY` | İzinli breach feed | Sağlayıcı sözleşmesi | Tedarikçi (yapılandırılmış JSON akışı) |
 | `DARKWEB_SOURCE_URL`, `DARKWEB_SOURCE_API_KEY` | İzinli dark web kaynağı | Sağlayıcı sözleşmesi | Tedarikçi |
 
-**MISP mecburi değil bu nedenle de dark web url-api key / breach feed url-api key'de mecbur değil 
+#MISP mecburi değil bu nedenle de dark web url-api key / breach feed url-api key'de mecbur değil 
 
 #### Genel yapılandırma
 
