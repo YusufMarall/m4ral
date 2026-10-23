@@ -136,7 +136,8 @@ Araç **hiçbir API anahtarı veya `.env` dosyası gerektirmez**. Yalnızca hede
 | `XPOSEDORNOT_API_KEY` | XposedOrNot | Public sorgu anahtarsız; doğrulanmış domain izleme için gerekli | https://xposedornot.com |
 | `BREACH_FEED_URL`, `BREACH_FEED_API_KEY` | İzinli breach feed | Sağlayıcı sözleşmesi | Tedarikçi (yapılandırılmış JSON akışı) |
 | `DARKWEB_SOURCE_URL`, `DARKWEB_SOURCE_API_KEY` | İzinli dark web kaynağı | Sağlayıcı sözleşmesi | Tedarikçi |
-| `DEEPDARKCTI_BASE_URL` | deepdarkCTI (GitHub) | **Anahtar gerekmez** | https://github.com/fastfire/deepdarkCTI |
+
+**MISP mecburi değil bu nedenle de dark web url-api key / breach feed url-api key'de mecbur değil 
 
 #### Genel yapılandırma
 
@@ -162,7 +163,4 @@ Araç **hiçbir API anahtarı veya `.env` dosyası gerektirmez**. Yalnızca hede
 
 Bu depodaki araçlar **yalnızca açık yazılı izin (sözleşme/kapsam) alınmış hedeflerde ve yetkili güvenlik testlerinde** kullanılmak üzere geliştirilmiştir. İzinsiz sistemlere yönelik kullanım yasa dışıdır. Kullanıcı, kullandığı tüm kaynak ve hedeflerin koşullarına ve yürürlükteki mevzuata uymakla yükümlüdür.
 
-## Gizli Bilgi Politikası
 
-- `.env` dosyaları ve API anahtarları **asla** sürüm kontrolüne eklenmez (bkz. `.gitignore`).
-- Tarama çıktıları (`results/`), veritabanları ve üretilen raporlar depoda tutulmaz.
